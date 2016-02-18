@@ -59,17 +59,23 @@ function shout(key, msg, type, attachment) {
 		},
    
         success: function(data) {
-            /* HERE DISPLAY TOASTER OR SOMETHING */
+            /* HERE DISPLAY A TOASTER OR SOMETHING */
         }
 	}); 
 };
 
 function shoutLink(key,url){
+
+  var isVideo = ytVidId(url) ? 1 : 0 ;
+  var type =  isVideo ?  2 : 3;
+
 	$.post('http://www.taringa.net/ajax/shout/attach', {
         key: key,
-        url: url
+        url: url,
+        isVideo:isVideo
     },function(object){		
-    	shout(key, object.data.title, 3, object.data.id );
+      var attachment = isVideo ? object.data.url : object.data.id;
+    	shout(key, object.data.title, type, attachment );
     });
 };
 
@@ -81,4 +87,15 @@ function shoutImage(key,url){
     },function(object){
     	shout(key,'',1, object.data.url);
     });
+}
+
+/**
+ * JavaScript function to match (and return) the video Id 
+ * of any valid Youtube Url, given as input string.
+ * @author: Stephan Schmitz <eyecatchup@gmail.com>
+ * @url: http://stackoverflow.com/a/10315969/624466
+ */
+function ytVidId(url) {
+  var p = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
+  return (url.match(p)) ? RegExp.$1 : false;
 }
