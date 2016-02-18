@@ -4,12 +4,13 @@
   "name": "Taringa! shouts toolkit",
   "short_name": "T! shouts",
   "description": "Comparte al instante fotos, links, y texto con tus seguidores!",
-  "version": "1.1",
+  "version": "1.2",
   
   "content_scripts": [
       {
           "matches": ["http://*/*","https://*/*"],
-          "js": ["jquery.js","content.js"]
+          "js": ["jquery.js","toastr.js","content.js"],
+          "css": ["toastr.css"]
       }
   ],
 
