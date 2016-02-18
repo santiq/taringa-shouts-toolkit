@@ -1,7 +1,14 @@
 chrome.runtime.onMessage.addListener(
   (request, sender, sendResponse)=> {
   	if(request.shout){
+      setupToaster();
+      toastr.info('Procesando...','');
   		getKet((err,obj)=>{
+        if(err){
+          toastr.clear();
+          toastr.error('Usuario no encontrado :(','');
+        }
+          
   			switch(request.shout){
 
   				case 'selection':
@@ -23,21 +30,37 @@ chrome.runtime.onMessage.addListener(
   	}  
 });
 
-
+function setupToaster(){
+  toastr.options = {
+    "closeButton": false,
+    "debug": false,
+    "newestOnTop": false,
+    "positionClass": "toast-top-center",
+    "preventDuplicates": false,
+    "onclick": null,
+    "showDuration": "300",
+    "hideDuration": "400",
+    "timeOut": "4000",
+    "extendedTimeOut": "1000",
+    "showEasing": "swing",
+    "hideEasing": "linear",
+    "showMethod": "fadeIn",
+    "hideMethod": "fadeOut"
+  }
+}
 
 function getKet(callback){
 	$.get('http://www.taringa.net',(body)=>{
-
+      
 			var pattern = /var global_data = { user: \'(.*)\', user_key: \'(.*)\', postid/;
-	    	var match = pattern.exec(body);
-	    	if ( match && match.length === 3 && match[1] !== '' && match[2] !== '') {
-	      		var userId = match[1];
-	      		var key = match[2];
-	      		callback(null,{userId:userId, key:key});	      		
-	  		}else{
-				callback('not-found');		    	
-	  		}
-  		
+    	var match = pattern.exec(body);
+    	if ( match && match.length === 3 && match[1] !== '' && match[2] !== '') {
+      		var userId = match[1];
+      		var key = match[2];
+      		callback(null,{userId:userId, key:key});	      		
+  		}else{
+			 callback('not-found');		    	
+  		}
 	})
 }
 
@@ -47,20 +70,19 @@ function shout(key, msg, type, attachment) {
 	type = type || 0;
 	msg = msg || ' ';
 	$.ajax({
-        type: 'POST',
-        url:'http://www.taringa.net/ajax/shout/add',
-        data:{
-	            key: key,
-	            attachment: attachment,
-	            attachment_type: type,
-	            privacy:0,
-	            body: msg.substring(0,254)
-	        
+    type: 'POST',
+    url:'http://www.taringa.net/ajax/shout/add',
+    data:{
+          key: key,
+          attachment: attachment,
+          attachment_type: type,
+          privacy:0,
+          body: msg.substring(0,254)      
 		},
-   
-        success: function(data) {
-            /* HERE DISPLAY A TOASTER OR SOMETHING */
-        }
+    success: function(data) {
+          toastr.clear();
+          toastr.success('Shout realizado!');
+    }        
 	}); 
 };
 
